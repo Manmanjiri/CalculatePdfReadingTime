@@ -1,0 +1,65 @@
+using System;
+using System.IO;
+using iText.Kernel.Pdf;
+using iText.Layout;
+using iText.Layout.Element;
+using iText.Forms;
+using iText.Forms.Fields;
+
+class AddTextToPDF
+{
+    static void Main(string[] args)
+    {
+        string pdfFilePath = @"path\to\your\output.pdf";  // The file path where the PDF will be saved
+
+        // Create a PDF document
+        using (PdfWriter writer = new PdfWriter(pdfFilePath))
+        using (PdfDocument pdfDoc = new PdfDocument(writer))
+        {
+            // Create the document layout
+            Document document = new Document(pdfDoc);
+
+            // Add a title to the PDF
+            document.Add(new Paragraph("Question and Answer Form"));
+
+            // Add a question (Text) field for input
+            document.Add(new Paragraph("1. What is your name?"));
+            AddTextField(pdfDoc, "NameField", 100, 650, 200, 20);
+
+            // Add another question (Text) field for input
+            document.Add(new Paragraph("2. What is your favorite color?"));
+            AddTextField(pdfDoc, "ColorField", 100, 600, 200, 20);
+
+            // Add a question with a checkbox for Yes/No selection
+            document.Add(new Paragraph("3. Do you like programming?"));
+            AddCheckBoxField(pdfDoc, "ProgrammingCheckbox", 100, 550);
+
+            // Close the document
+            document.Close();
+        }
+
+        Console.WriteLine("PDF created with question-answer boxes!");
+    }
+
+    // Function to add a text field (for Q&A answer input)
+    static void AddTextField(PdfDocument pdfDoc, string fieldName, float x, float y, float width, float height)
+    {
+        // Create a form field for input
+        PdfAcroForm form = PdfAcroForm.GetAcroForm(pdfDoc, true);
+        PdfTextFormField textField = PdfFormField.CreateText(pdfDoc, new iText.Kernel.Geom.Rectangle(x, y, width, height), fieldName, "");
+        
+        // Add the field to the form
+        form.AddField(textField);
+    }
+
+    // Function to add a checkbox (for Yes/No answers)
+    static void AddCheckBoxField(PdfDocument pdfDoc, string fieldName, float x, float y)
+    {
+        PdfAcroForm form = PdfAcroForm.GetAcroForm(pdfDoc, true);
+        PdfCheckBoxFormField checkBox = PdfFormField.CreateCheckBox(pdfDoc, new iText.Kernel.Geom.Rectangle(x, y, 20, 20), fieldName);
+        checkBox.SetCheckType(PdfCheckBoxFormField.TYPE_CHECK);
+        
+        // Add the checkbox to the form
+        form.AddField(checkBox);
+    }
+}
